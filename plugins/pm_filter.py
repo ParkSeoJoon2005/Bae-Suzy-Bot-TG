@@ -71,7 +71,7 @@ async def next_page(bot, query):
 
     ident, req, key, offset = query.data.split("_")
     if int(req) not in [query.from_user.id, 0]:
-        return await query.answer("oKda", show_alert=True)
+        return await query.answer("It's Not For You 😈", show_alert=True)
     try:
         offset = int(offset)
     except:
@@ -90,9 +90,12 @@ async def next_page(bot, query):
     if files:
         for file in files:
             file_id = file.file_id
-            btn.append(
-                [InlineKeyboardButton(text=f"{file.file_name}", callback_data=f'files#{file_id}'), InlineKeyboardButton(text=f"{get_size(file.file_size)}", callback_data=f'files_#{file_id}')]
-                )
+            btn = [
+            [
+                InlineKeyboardButton(
+                    text=f"🎥[{get_size(file.file_size)}] 🎬{file.file_name}", callback_data=f'files#{file.file_id}'
+                ),
+            ]
     if 0 < offset <= 10:
         off_set = 0
     elif offset == 0:

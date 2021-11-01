@@ -547,14 +547,10 @@ async def auto_filter(client, message):
                 [InlineKeyboardButton(text=f"🗓 1/{round(int(total_results)/10)}",callback_data="pages"), InlineKeyboardButton(text="NEXT ⏩",callback_data=f"next_{req}_{key}_{offset}")]
             )
         else:
-            buttons.append(
-                    [
-                        InlineKeyboardButton(
-                            text=f"{title}{act}", callback_data=f"groupcb:{groupid}:{title}:{act}"
-                        )
-                    ]
-                )
-        imdb=await get_poster(search)
+            btn.append(
+                [InlineKeyboardButton(text="🗓 1/1",callback_data="pages")]
+            )
+        imdb=await get_poster(search) if IMDB else None
         if imdb and imdb.get('poster'):
             await message.reply_photo(photo=imdb.get('poster'), caption=f"🏷 Title: <a href={imdb['url']}>{imdb.get('title')}</a>\n🎭 Genres: {imdb.get('genres')}\n📆 Year: <a href={imdb['url']}/releaseinfo>{imdb.get('year')}</a>\n🌟 Rating: <a href={imdb['url']}/ratings>{imdb.get('rating')}</a> / 10 \n My PM : @SpaciousUniverseBot", reply_markup=InlineKeyboardMarkup(btn))
         elif imdb:

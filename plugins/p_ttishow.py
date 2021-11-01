@@ -44,8 +44,6 @@ async def save_group(bot, message):
         await message.reply_text(
             text=f"<b>Thank you For Adding Me In {message.chat.title} ❣️\n\nPlz promote me as Admin ,After that i can Reply requests.</b>",
             reply_markup=reply_markup)
-    else:
-        pass
 
 
 @Client.on_message(filters.command('leave') & filters.user(ADMINS))

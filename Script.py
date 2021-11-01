@@ -15,7 +15,11 @@ class script(object):
 - Source - https://github.com/kalanakt/Bae-Suzy-Bot-TG  
 
 <b>DEVS:</b>
-- <a href=https://t.me/TeamEvamaria>Team Eva Maria</a>"""
+- <a href=https://telegram.dog/EvaMariaDevs>Team Eva Maria</a>
+
+<b>Maintaince By:</b>
+- <a href=https://github.com/kalanakt>Hash Minner</a>
+"""
     MANUELFILTER_TXT = """Help: <b>Filters</b>
 
 - Filter is the feature were users can set automated replies for a particular keyword and tessa will respond whenever a keyword is found the message
@@ -40,7 +44,7 @@ class script(object):
 3. Buttons should be properly parsed as markdown format
 
 <b>URL buttons:</b>
-<code>[Button Text](buttonurl:https//t.me/EvaMariaBot)</code>
+<code>[Button Text](buttonurl:https//t.me/spaciousuniversebot)</code>
 
 <b>Alert buttons:</b>
 <code>[Button Text](buttonalert:This is an alert message)</code>"""

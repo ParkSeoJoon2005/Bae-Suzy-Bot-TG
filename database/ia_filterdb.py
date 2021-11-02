@@ -49,6 +49,7 @@ async def save_file(media):
         )
     except ValidationError:
         logger.exception('Error occurred while saving file in database')
+        return False, 2
     else:
         try:
             await file.commit()

@@ -22,7 +22,7 @@ class script(object):
 """
     MANUELFILTER_TXT = """Help: <b>Filters</b>
 
-- Filter is the feature were users can set automated replies for a particular keyword and tessa will respond whenever a keyword is found the message
+- Filter is the feature were users can set automated replies for a particular keyword and suzy will respond whenever a keyword is found the message
 
 <b>NOTE:</b>
 1. eva maria should have admin privillage.
@@ -71,7 +71,7 @@ class script(object):
     EXTRAMOD_TXT = """Help: <b>Extra Modules</b>
 
 <b>NOTE:</b>
-these are the extra features of tessa
+these are the extra features of suzy
 
 <b>Commands and Usage:</b>
 • /id - <code>get id of a specifed user.</code>

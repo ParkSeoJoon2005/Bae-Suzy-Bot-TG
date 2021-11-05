@@ -39,7 +39,7 @@
 * `LOG_CHANNEL` : A channel to log the activities of bot. Make sure bot is an admin in the channel.
 ### Optional Variables
 * `PICS`: Telegraph links of images to show in start message.( Multiple images can be used seperated by space )
-* Check [info.py](https://github.com/kalanakt/Bae-Suzy-Bot-TG/info.py) for more
+* Check info.py for more details. 
 
 
 ## Deploy

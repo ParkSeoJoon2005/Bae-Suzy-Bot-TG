@@ -137,6 +137,27 @@ async def next_page(bot, query):
     except MessageNotModified:
         pass
     await query.answer()
+   
+@Client.on_callback_query(filters.regex(r"^spolling"))
+async def advantage_spoll_choker(bot, query):
+    _, user, movie_ = query.data.split('#')
+    if int(user) != 0 and query.from_user.id != int(user):
+        return await query.answer("It's Not For You", show_alert=True)
+    if movie_  == "close_spellcheck":
+        return await query.message.delete()
+    movies = SPELL_CHECK.get(query.message.reply_to_message.message_id)
+    if not movies:
+        return await query.answer("You are clicking on an old button which is expired.", show_alert=True)
+    movie = movies[(int(movie_))]
+    await query.answer('Checking for Movie in database...')
+    files, offset, total_results = await get_search_results(movie, offset=0, filter=True)
+    if files:
+        k = (movie, files, offset, total_results)
+        await auto_filter(bot, query, k)
+    else:
+        k = await query.message.edit('This Movie Not Found In DataBase...')
+        await asyncio.sleep(10)
+        await k.delete()
 
 
 @Client.on_callback_query()
@@ -544,7 +565,15 @@ async def auto_filter(client, message):
         search = message.text
         files, offset, total_results = await get_search_results(search.lower(), offset=0)
         if not files:
+            if SPELL_CHECK_REPLY:
+                    return await advantage_spell_chok(msg)
+                else:
+                    return
+        else:
             return
+    else:
+        message = msg.message.reply_to_message # msg will be callback query
+        search, files, offset, total_results = spoll
         if SINGLE_BUTTON:
             btn = [
                 [
@@ -580,11 +609,100 @@ async def auto_filter(client, message):
             btn.append(
                 [InlineKeyboardButton(text="🗓 1/1",callback_data="pages")]
             )
-        imdb=await get_poster(search) 
-        if imdb and imdb.get('poster'):
-            await message.reply_photo(photo=imdb.get('poster'), caption=f"🏷 Title: <a href={imdb['url']}>{imdb.get('title')}</a>\n🎭 Genres: {imdb.get('genres')}\n📆 Year: <a href={imdb['url']}/releaseinfo>{imdb.get('year')}</a>\n🌟 Rating: <a href={imdb['url']}/ratings>{imdb.get('rating')}</a> / 10 \n My PM : @SpaciousUniverseBot", reply_markup=InlineKeyboardMarkup(btn))
-        elif imdb:
-            await message.reply_text(f"🏷 Title: <a href={imdb['url']}>{imdb.get('title')}</a>\n🎭 Genres: {imdb.get('genres')}\n📆 Year: <a href={imdb['url']}/releaseinfo>{imdb.get('year')}</a>\n🌟 Rating: <a href={imdb['url']}/ratings>{imdb.get('rating')}</a> / 10 \n My PM : @SpaciousUniverseBot", reply_markup=InlineKeyboardMarkup(btn))
-        else:
-            await message.reply_text(f"<b>Here is What I Found In My Database For Your Requast {search} ‌‌‌‌‎ \n My PM : @SpaciousUniverseBot </b>", reply_markup=InlineKeyboardMarkup(btn))
+        imdb = await get_poster(search, file=(files[0]).file_name) if IMDB else None
+        if imdb:
+            cap = IMDB_TEMPLATE.format(
+            query = search,
+            title = imdb['title'],
+            votes = imdb['votes'],
+            aka = imdb["aka"],
+            seasons = imdb["seasons"],
+            box_office = imdb['box_office'],
+            localized_title = imdb['localized_title'],
+            kind = imdb['kind'],
+            imdb_id = imdb["imdb_id"],
+            cast = imdb["cast"],
+            runtime = imdb["runtime"],
+            countries = imdb["countries"],
+            certificates = imdb["certificates"],
+            languages = imdb["languages"],
+            director = imdb["director"],
+            writer = imdb["writer"],
+            producer = imdb["producer"],
+            composer = imdb["composer"],
+            cinematographer = imdb["cinematographer"],
+            music_team = imdb["music_team"],
+            distributors = imdb["distributors"],
+            release_date = imdb['release_date'],
+            year = imdb['year'],
+            genres = imdb['genres'],
+            poster = imdb['poster'],
+            plot = imdb['plot'],
+            rating = imdb['rating'],
+            url = imdb['url']
+        )
+    else:
+        cap = f"Here is what i found for your Request {search}"
+    if imdb and imdb.get('poster'):
+        try:
+            await message.reply_photo(photo=imdb.get('poster'), caption=cap, reply_markup=InlineKeyboardMarkup(btn))
+        except (MediaEmpty, PhotoInvalidDimensions, WebpageMediaEmpty):
+            pic = imdb.get('poster')
+            poster = pic.replace('.jpg', "._V1_UX360.jpg")
+            await message.reply_photo(photo=poster, caption=cap, reply_markup=InlineKeyboardMarkup(btn))
+        except Exception as e:
+            logger.exception(e)
+            await message.reply_text(cap, reply_markup=InlineKeyboardMarkup(btn))
+    else:
+        await message.reply_text(cap, reply_markup=InlineKeyboardMarkup(btn))
+    if spoll:
+        await msg.message.delete()
         
+
+async def advantage_spell_chok(msg):
+    query = re.sub(r"\b(pl(i|e)*?(s|z+|ease|se|ese|(e+)s(e)?)|((send|snd|giv(e)?|gib)(\sme)?)|movie(s)?|new|latest|br((o|u)h?)*|^h(e)?(l)*(o)*|mal(ayalam)?|tamil|file|that|find|und(o)*|kit(t(i|y)?)?o(w)?|thar(o)*w?|kittum(o)*|aya(k)*(um(o)*)?|full\smovie|any(one)|with\ssubtitle)", "", msg.text, flags=re.IGNORECASE) # plis contribute some common words 
+    query = query.strip() + " movie"
+    g_s = await search_gagala(query)
+    g_s += await search_gagala(msg.text)
+    gs_parsed = []
+    if not g_s:
+        k = await msg.reply("I couldn't find any movie in that name.")
+        await asyncio.sleep(8)
+        await k.delete()
+        return
+    regex = re.compile(r".*(imdb|wikipedia).*", re.IGNORECASE) # look for imdb / wiki results
+    gs = list(filter(regex.match, g_s))
+    gs_parsed = [re.sub(r'\b(\-([a-zA-Z-\s])\-\simdb|(\-\s)?imdb|(\-\s)?wikipedia|\(|\)|\-|reviews|full|all|episode(s)?|film|movie|series)', '', i, flags=re.IGNORECASE) for i in gs]
+    if not gs_parsed:
+        reg = re.compile(r"watch(\s[a-zA-Z0-9_\s\-\(\)]*)*\|.*", re.IGNORECASE) # match something like Watch Niram | Amazon Prime 
+        for mv in g_s:
+            match  = reg.match(mv)
+            if match:
+                gs_parsed.append(match.group(1))
+    user = msg.from_user.id if msg.from_user else 0
+    movielist = []
+    gs_parsed = list(dict.fromkeys(gs_parsed)) # removing duplicates https://stackoverflow.com/a/7961425
+    if len(gs_parsed) > 3:
+        gs_parsed = gs_parsed[:3]
+    if gs_parsed:
+        for mov in gs_parsed:
+            imdb_s = await get_poster(mov.strip(), bulk=True) # searching each keyword in imdb
+            if imdb_s:
+                movielist += [movie.get('title') for movie in imdb_s]
+    movielist += [(re.sub(r'(\-|\(|\)|_)', '', i, flags=re.IGNORECASE)).strip() for i in gs_parsed]
+    movielist = list(dict.fromkeys(movielist)) # removing duplicates
+    if not movielist:
+        k = await msg.reply("I couldn't find anything related to that. Check your spelling")
+        await asyncio.sleep(8)
+        await k.delete()
+        return
+    SPELL_CHECK[msg.message_id] = movielist
+    btn = [[
+                InlineKeyboardButton(
+                    text=movie.strip(),
+                    callback_data=f"spolling#{user}#{k}",
+                )
+            ] for k, movie in enumerate(movielist)]
+    btn.append([InlineKeyboardButton(text="Close", callback_data=f'spolling#{user}#close_spellcheck')])
+    await msg.reply("I couldn't find anything related to that\nDid you mean any one of these?", reply_markup=InlineKeyboardMarkup(btn))
+    

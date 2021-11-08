@@ -5,6 +5,9 @@ from utils import extract_user, get_file_id, get_poster, last_online
 import time
 from datetime import datetime
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+import logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.ERROR)
 
 @Client.on_message(filters.command('id'))
 async def showid(client, message):
@@ -29,15 +32,15 @@ async def showid(client, message):
         if message.reply_to_message:
             _id += (
                 "<b>➲ User ID</b>: "
-                f"<code>{message.from_user.id}</code>\n"
+                f"<code>{message.from_user.id if message.from_user else 'Anonymous'}</code>\n"
                 "<b>➲ Replied User ID</b>: "
-                f"<code>{message.reply_to_message.from_user.id}</code>\n"
+                f"<code>{message.reply_to_message.from_user.id if message.reply_to_message.from_user else 'Anonymous'}</code>\n"
             )
             file_info = get_file_id(message.reply_to_message)
         else:
             _id += (
                 "<b>➲ User ID</b>: "
-                f"<code>{message.from_user.id}</code>\n"
+                f"<code>{message.from_user.id if message.from_user else 'Anonymous'}</code>\n"
             )
             file_info = get_file_id(message)
         if file_info:
@@ -67,19 +70,18 @@ async def who_is(client, message):
         await status_message.edit(str(error))
         return
     if from_user is None:
-        await status_message.edit("no valid user_id / message specified")
-    else:
-        message_out_str = ""
-        message_out_str += f"<b>➲First Name:</b> {from_user.first_name}\n"
-        last_name = from_user.last_name or "<b>None</b>"
-        message_out_str += f"<b>➲Last Name:</b> {last_name}\n"
-        message_out_str += f"<b>➲Telegram ID:</b> <code>{from_user.id}</code>\n"
-        username = from_user.username or "<b>None</b>"
-        dc_id = from_user.dc_id or "[User Doesnt Have A Valid DP]"
-        message_out_str += f"<b>➲Data Centre:</b> <code>{dc_id}</code>\n"
-        message_out_str += f"<b>➲User Name:</b> @{username}\n"
-        message_out_str += f"<b>➲User 𝖫𝗂𝗇𝗄:</b> <a href='tg://user?id={from_user.id}'><b>Click Here</b></a>\n"
-        if message.chat.type in (("supergroup", "channel")):
+        return await status_message.edit("no valid user_id / message specified")
+    message_out_str = ""
+    message_out_str += f"<b>➲First Name:</b> {from_user.first_name}\n"
+    last_name = from_user.last_name or "<b>None</b>"
+    message_out_str += f"<b>➲Last Name:</b> {last_name}\n"
+    message_out_str += f"<b>➲Telegram ID:</b> <code>{from_user.id}</code>\n"
+    username = from_user.username or "<b>None</b>"
+    dc_id = from_user.dc_id or "[User Doesnt Have A Valid DP]"
+    message_out_str += f"<b>➲Data Centre:</b> <code>{dc_id}</code>\n"
+    message_out_str += f"<b>➲User Name:</b> @{username}\n"
+    message_out_str += f"<b>➲User 𝖫𝗂𝗇𝗄:</b> <a href='tg://user?id={from_user.id}'><b>Click Here</b></a>\n"
+    if message.chat.type in (("supergroup", "channel")):
             try:
                 chat_member_p = await message.chat.get_member(from_user.id)
                 joined_date = datetime.fromtimestamp(
@@ -157,11 +159,52 @@ async def imdb_callback(bot: Client, query: CallbackQuery):
                 )
             ]
         ]
+    if imdb:
+        caption = IMDB_TEMPLATE.format(
+            query = imdb['title'],
+            title = imdb['title'],
+            votes = imdb['votes'],
+            aka = imdb["aka"],
+            seasons = imdb["seasons"],
+            box_office = imdb['box_office'],
+            localized_title = imdb['localized_title'],
+            kind = imdb['kind'],
+            imdb_id = imdb["imdb_id"],
+            cast = imdb["cast"],
+            runtime = imdb["runtime"],
+            countries = imdb["countries"],
+            certificates = imdb["certificates"],
+            languages = imdb["languages"],
+            director = imdb["director"],
+            writer = imdb["writer"],
+            producer = imdb["producer"],
+            composer = imdb["composer"],
+            cinematographer = imdb["cinematographer"],
+            music_team = imdb["music_team"],
+            distributors = imdb["distributors"],
+            release_date = imdb['release_date'],
+            year = imdb['year'],
+            genres = imdb['genres'],
+            poster = imdb['poster'],
+            plot = imdb['plot'],
+            rating = imdb['rating'],
+            url = imdb['url']
+        )
+    else:
+        caption = "No Results"
     if imdb.get('poster'):
-        await query.message.reply_photo(photo=imdb['poster'], caption=f"IMDb Data:\n\n🏷 Title:<a href={imdb['url']}>{imdb.get('title')}</a>\n🎭 Genres: {imdb.get('genres')}\n📆 Year:<a href={imdb['url']}/releaseinfo>{imdb.get('year')}</a>\n🌟 Rating: <a href={imdb['url']}/ratings>{imdb.get('rating')}</a> / 10\n🖋 StoryLine: <code>{imdb.get('plot')} </code>", reply_markup=InlineKeyboardMarkup(btn))
+        try:
+            await query.message.reply_photo(photo=imdb['poster'], caption=caption, reply_markup=InlineKeyboardMarkup(btn))
+        except (MediaEmpty, PhotoInvalidDimensions, WebpageMediaEmpty):
+            pic = imdb.get('poster')
+            poster = pic.replace('.jpg', "._V1_UX360.jpg")
+            await query.message.reply_photo(photo=imdb['poster'], caption=caption, reply_markup=InlineKeyboardMarkup(btn))
+        except Exception as e:
+            logger.exception(e)
+            await query.message.reply(caption, reply_markup=InlineKeyboardMarkup(btn), disable_web_page_preview=False)
         await query.message.delete()
     else:
-        await query.message.edit(f"IMDb Data:\n\n🏷 Title:<a href={imdb['url']}>{imdb.get('title')}</a>\n🎭 Genres: {imdb.get('genres')}\n📆 Year:<a href={imdb['url']}/releaseinfo>{imdb.get('year')}</a>\n🌟 Rating: <a href={imdb['url']}/ratings>{imdb.get('rating')}</a> / 10\n🖋 StoryLine: <code>{imdb.get('plot')} </code>", reply_markup=InlineKeyboardMarkup(btn), disable_web_page_preview=True)
+        await query.message.edit(caption, reply_markup=InlineKeyboardMarkup(btn), disable_web_page_preview=False)
     await query.answer()
         
 

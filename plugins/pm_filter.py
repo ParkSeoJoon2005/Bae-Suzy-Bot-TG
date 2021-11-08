@@ -66,7 +66,7 @@ async def give_filter(client,message):
                             reply_markup=InlineKeyboardMarkup(button)
                         )
                 except Exception as e:
-                    print(e)
+                    logger.exception(e)
                 break 
 
     else:
@@ -86,7 +86,6 @@ async def next_page(bot, query):
     if not search:
         await query.answer("You are using this for one of my old message, please send the request again.",show_alert=True)
         return
-    btn=[]
 
     files, n_offset, total = await get_search_results(search, offset=offset, filter=True)
     try:
@@ -383,7 +382,10 @@ async def cb_handler(client: Client, query: CallbackQuery):
             await query.answer("I Like Your Smartness, But Don't Be Oversmart 😒",show_alert=True)
             return
         ident, file_id = query.data.split("#")
-        files = (await get_file_details(file_id))[0]
+        files = await get_file_details(file_id)
+        if not files_:
+            return await query.answer('No such file exist.')
+        files = files_[0]
         title = files.file_name
         size=get_size(files.file_size)
         f_caption=files.caption
@@ -391,7 +393,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             try:
                 f_caption=CUSTOM_FILE_CAPTION.format(file_name=title, file_size=size, file_caption=f_caption)
             except Exception as e:
-                print(e)
+                logger.exception(e)
                 f_caption=f_caption
         if f_caption is None:
             f_caption = f"{title}"
@@ -569,7 +571,7 @@ async def auto_filter(client, message):
     if 2 < len(message.text) < 100:
          
         search = message.text
-        files, offset, total_results = await get_search_results(search.lower(), offset=0)
+        files, offset, total_results = await get_search_results(search.lower(), offset=0, filter=True)
         if not files:
             if SPELL_CHECK_REPLY:
                     return await advantage_spell_chok(msg)
@@ -648,7 +650,7 @@ async def auto_filter(client, message):
             url = imdb['url']
         )
     else:
-        cap = f"Here is what i found for your Request {search}"
+        cap = f"Here is what i found for your Request {search} \n My PM @SpaciousUniverseBot"
     if imdb and imdb.get('poster'):
         try:
             await message.reply_photo(photo=imdb.get('poster'), caption=cap, reply_markup=InlineKeyboardMarkup(btn))

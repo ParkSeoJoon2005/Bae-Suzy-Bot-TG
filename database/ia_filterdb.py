@@ -72,10 +72,6 @@ async def get_search_results(query, file_type=None, max_results=10, offset=0, fi
         raw_pattern = r'(\b|[\.\+\-_])' + query + r'(\b|[\.\+\-_])'
     else:
         raw_pattern = query.replace(' ', r'.*[\s\.\+\-_]')
-    if filter:
-        #better ?
-        raw_pattern = r'([a-zA-Z0-9\.\+\-_])*?' + query + r'([a-zA-Z0-9\.\+\-_])*?'
-        raw_pattern = query.replace(' ', r'(\s|\.|\+|\-|_)*?')
     try:
         regex = re.compile(raw_pattern, flags=re.IGNORECASE)
     except:

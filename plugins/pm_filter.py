@@ -575,8 +575,8 @@ async def auto_filter(client, message):
         if not files:
             if SPELL_CHECK_REPLY:
                     return await advantage_spell_chok(msg)
-                else:
-                    return
+            else:
+               return
         else:
             return
     else:

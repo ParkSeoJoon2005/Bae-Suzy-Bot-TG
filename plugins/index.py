@@ -138,6 +138,7 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
     duplicate = 0
     errors = 0
     deleted = 0
+    no_media = 0
     async with lock:
         try:
             total = lst_msg_id + 1

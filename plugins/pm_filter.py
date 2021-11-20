@@ -97,14 +97,9 @@ async def next_page(bot, query):
     if SINGLE_BUTTON:
         btn = [
             [
-                [
-                   InlineKeyboardButton("🚦My PM🚦", url="https://t.me/SpaciousUniverseBot")
-                ],
-               [
                 InlineKeyboardButton(
                     text=f"[{get_size(file.file_size)}] {file.file_name}", callback_data=f'files#{file.file_id}'
                 ),
-               ]
             ]
             for file in files
         ]

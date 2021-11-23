@@ -31,3 +31,11 @@ if request.status_code == 200:
   total_quota = result['account_quota']
   quota_used = result['quota_used']
   quota_left = total_quota - quota_used
+  hours = math.floor(quota_left/3600)
+  minutes = math.floor(quota_left/60 % 60)
+  days = math.floor(hours/24)
+  dyno = f"""
+  
+  {hours} hours {days} days
+  
+  """

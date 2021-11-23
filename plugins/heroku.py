@@ -35,8 +35,3 @@ if request.status_code == 200:
   total_quota = result['account_quota']
   quota_used = result['quota_used']
   quota_left = total_quota - quota_used
-  quota_details = f"""
-  > __Dyno hours remaining this month__ ;
-        - **{hours} hours**  ( {leftperc}% )
-        - **Approximately {days} days!**
-        """

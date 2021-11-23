@@ -22,7 +22,7 @@ user_agent = (
 accountid = server.account().id
 headers = {
   'User-Agent': user_agent,
-  'Authorization': f'Bearer {Config.HEROKU_API_KEY}',
+  'Authorization': f'Bearer {HEROKU_API_KEY}',
   'Accept': 'application/vnd.heroku+json; version=3.account-quotas',
 }
 

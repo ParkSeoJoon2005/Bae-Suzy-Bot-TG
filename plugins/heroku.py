@@ -7,10 +7,6 @@ import time
 import shutil
 import heroku3
 import requests
-
-from pyrogram import filters
-from pyrogram import Client as kinu6
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from info import HEROKU_API_KEY
 
 server = heroku3.from_key(HEROKU_API_KEY)

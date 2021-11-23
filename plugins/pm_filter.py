@@ -541,7 +541,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             InlineKeyboardButton('♻️', callback_data='rfrsh')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
-        timeleft = get_size(quota_left)
+        timeleft = quota_left
         total = await Media.count_documents()
         users = await db.total_users_count()
         chats = await db.total_chat_count()
@@ -561,7 +561,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             InlineKeyboardButton('♻️', callback_data='rfrsh')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
-        timeleft = get_size(quota_left)
+        timeleft = quota_left
         total = await Media.count_documents()
         users = await db.total_users_count()
         chats = await db.total_chat_count()

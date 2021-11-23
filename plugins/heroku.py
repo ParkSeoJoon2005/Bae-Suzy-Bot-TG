@@ -34,8 +34,4 @@ if request.status_code == 200:
   hours = math.floor(quota_left/3600)
   minutes = math.floor(quota_left/60 % 60)
   days = math.floor(hours/24)
-  dyno = f"""
-  
-  {hours} hours {days} days
-  
-  """
+  dyno = f"{days} days ({hours} hours)"

@@ -13,6 +13,7 @@ from pyrogram import Client, filters
 from pyrogram.errors import FloodWait, UserIsBlocked, MessageNotModified, PeerIdInvalid
 from utils import get_size, is_subscribed, get_poster, search_gagala, temp
 from database.users_chats_db import db
+from plugins.heroku import quota_details
 from database.ia_filterdb import Media, get_file_details, get_search_results
 from database.filters_mdb import(
    del_all,
@@ -559,6 +560,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             InlineKeyboardButton('♻️', callback_data='rfrsh')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
+        timeleft = get_size(quota_left)
         total = await Media.count_documents()
         users = await db.total_users_count()
         chats = await db.total_chat_count()
@@ -567,7 +569,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         monsize = get_size(monsize)
         free = get_size(free)
         await query.message.edit_text(
-            text=script.STATUS_TXT.format(total, users, chats, monsize, free),
+            text=script.STATUS_TXT.format(total, users, chats, monsize, free, timeleft),
             reply_markup=reply_markup,
             parse_mode='html'
       )

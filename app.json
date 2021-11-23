@@ -29,6 +29,10 @@
             "description": "Get this value from https://my.telegram.org",
             "value": ""
         },
+        "HEROKU_API_KEY": {
+            "description": "To check dyno status. Go to https://dashboard.heroku.com/account, scroll down and press Reveal API",
+            "value": ""
+        },
         "CHANNELS": {
             "description": "Username or ID of channel or group. Separate multiple IDs by space.",
             "value": ""

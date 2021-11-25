@@ -20,7 +20,7 @@ from utils import get_size, is_subscribed, temp
 
 logger = logging.getLogger(__name__)
 
-@Client.on_message((filters.private | filters.group) & filters.command('status'))
+@Client.on_message(filters.command("status"))
 async def bot_status(client,message):
     if Config.HEROKU_API_KEY:
         try:

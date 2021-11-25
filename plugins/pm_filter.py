@@ -541,7 +541,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             InlineKeyboardButton('♻️', callback_data='rfrsh')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
-        timeleft = dyno
+        timeleft = await dyno
         total = await Media.count_documents()
         users = await db.total_users_count()
         chats = await db.total_chat_count()

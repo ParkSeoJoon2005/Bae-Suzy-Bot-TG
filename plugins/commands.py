@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 @Client.on_message(filters.command("status"))
 async def bot_status(client,message):
-    if Config.HEROKU_API_KEY:
+    if HEROKU_API_KEY:
         try:
             server = heroku3.from_key(HEROKU_API_KEY)
 
@@ -69,6 +69,7 @@ async def bot_status(client,message):
         - **Approximately {days} days!**
 """
 
+                
 @Client.on_message(filters.command("start"))
 async def start(client, message):
     if message.chat.type in ['group', 'supergroup']:
